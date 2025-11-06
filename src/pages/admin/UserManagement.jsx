@@ -16,6 +16,7 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import UserModal from '../../components/admin/UserModal';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import { adminUserService } from '../../services/adminUserService';
+import { useDebounce } from '../../hooks/useDebounce';
 import toast from 'react-hot-toast';
 
 const UserManagement = () => {
@@ -36,6 +37,9 @@ const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedUsers, setSelectedUsers] = useState([]);
   
+  // Debounce search term - chỉ search sau 500ms khi user ngừng gõ
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  
   // Modal states
   const [userModal, setUserModal] = useState({ isOpen: false, user: null, loading: false });
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, user: null, action: null, loading: false });
@@ -47,7 +51,7 @@ const UserManagement = () => {
       const params = {
         page,
         size: 10,
-        search: searchTerm,
+        search: debouncedSearchTerm, // Sử dụng debounced search term
         role: filterRole === 'all' ? undefined : filterRole,
         status: filterStatus,
         sortBy: 'createdAt',
@@ -64,13 +68,22 @@ const UserManagement = () => {
     }
   };
 
+  // Effect để fetch data khi debounced search term thay đổi
   useEffect(() => {
     fetchUsers(0);
     setCurrentPage(0);
-  }, [searchTerm, filterRole, filterStatus]);
+  }, [debouncedSearchTerm, filterRole, filterStatus]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    // Nếu nhấn Enter, tìm kiếm ngay lập tức
+    if (e.key === 'Enter') {
+      fetchUsers(0);
+      setCurrentPage(0);
+    }
   };
 
   const handleRoleFilter = (e) => {
@@ -228,12 +241,27 @@ const UserManagement = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Tìm theo tên, email..."
+                  placeholder="Tìm theo tên, email, số điện thoại... (Nhấn Enter để tìm ngay)"
                   value={searchTerm}
                   onChange={handleSearch}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  onKeyPress={handleSearchKeyPress}
+                  className="block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
+                {/* Loading indicator khi đang chờ debounce */}
+                {searchTerm !== debouncedSearchTerm && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
+                  </div>
+                )}
               </div>
+              {searchTerm && (
+                <p className="mt-1 text-xs text-gray-500">
+                  {searchTerm !== debouncedSearchTerm 
+                    ? 'Đang tìm kiếm...' 
+                    : `Tìm kiếm: "${debouncedSearchTerm}"`
+                  }
+                </p>
+              )}
             </div>
 
             {/* Role filter */}
