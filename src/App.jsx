@@ -6,6 +6,9 @@ import Register from './components/auth/Register';
 import ForgotPassword from './components/auth/ForgotPassword';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UserManagement from './pages/admin/UserManagement';
 import './App.css';
 
 // Protected Route Component
@@ -14,10 +17,27 @@ const ProtectedRoute = ({ children }) => {
   return token ? children : <Navigate to="/login" replace />;
 };
 
+// Admin Route Component
+const AdminRoute = ({ children }) => {
+  const token = localStorage.getItem('accessToken');
+  
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
+
 // Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }) => {
   const token = localStorage.getItem('accessToken');
-  return !token ? children : <Navigate to="/dashboard" replace />;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  if (token) {
+    return <Navigate to="/admin" replace />;
+  }
+  
+  return children;
 };
 
 function App() {
@@ -54,15 +74,25 @@ function App() {
             } 
           />
           
-          {/* Protected Routes */}
+          {/* Legacy dashboard redirect */}
+          <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
+          
+          {/* Admin Routes */}
           <Route 
-            path="/dashboard" 
+            path="/admin" 
             element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="products" element={<div className="p-6">Quản lý sản phẩm - Coming soon</div>} />
+            <Route path="orders" element={<div className="p-6">Quản lý đơn hàng - Coming soon</div>} />
+            <Route path="analytics" element={<div className="p-6">Thống kê - Coming soon</div>} />
+            <Route path="settings" element={<div className="p-6">Cài đặt - Coming soon</div>} />
+          </Route>
           
           {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/" replace />} />

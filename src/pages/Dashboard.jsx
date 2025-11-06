@@ -28,7 +28,7 @@ const Dashboard = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Xin chào, {user.fullName}</span>
+              <span className="text-gray-700">Xin chào, {user.firstName} {user.lastName}</span>
               <button
                 onClick={handleLogout}
                 className="text-red-600 hover:text-red-800 font-medium transition-colors"
@@ -55,10 +55,10 @@ const Dashboard = () => {
               <User className="h-8 w-8 text-indigo-600" />
             </div>
             <div className="ml-4">
-              <h2 className="text-xl font-semibold text-gray-900">{user.fullName}</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{user.firstName} {user.lastName}</h2>
               <p className="text-gray-600">{user.email}</p>
               <p className="text-sm text-gray-500">
-                Tham gia từ: {new Date(user.createdAt).toLocaleDateString('vi-VN')}
+                Tham gia từ: {user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
               </p>
             </div>
           </div>

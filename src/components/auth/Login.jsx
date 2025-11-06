@@ -31,7 +31,9 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(response.user));
       
       toast.success('Đăng nhập thành công!');
-      navigate('/dashboard');
+      
+      // Redirect to admin dashboard
+      navigate('/admin');
     } catch (error) {
       console.error('Login error:', error);
     } finally {
