@@ -33,7 +33,7 @@ const Login = () => {
       toast.success('Đăng nhập thành công!');
       
       // Redirect to admin dashboard
-      navigate('/admin');
+      navigate('/admin/dashboard');
     } catch (error) {
       console.error('Login error:', error);
     } finally {

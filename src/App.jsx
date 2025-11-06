@@ -75,7 +75,7 @@ function App() {
           />
           
           {/* Legacy dashboard redirect */}
-          <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
           
           {/* Admin Routes */}
           <Route 
@@ -86,7 +86,7 @@ function App() {
               </AdminRoute>
             }
           >
-            <Route index element={<AdminDashboard />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="products" element={<div className="p-6">Quản lý sản phẩm - Coming soon</div>} />
             <Route path="orders" element={<div className="p-6">Quản lý đơn hàng - Coming soon</div>} />
