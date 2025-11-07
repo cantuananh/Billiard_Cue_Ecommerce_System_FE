@@ -86,7 +86,7 @@ const AdminHeader = ({ setSidebarOpen }) => {
               </div>
               <input
                 type="text"
-                placeholder="Tìm kiếm người dùng, sản phẩm, đơn hàng..."
+                placeholder="Tìm kiếm tất cả ở đây..."
                 className="block w-full pl-12 pr-4 py-3 bg-white/60 backdrop-blur-sm border border-white/20 rounded-2xl leading-5 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 focus:bg-white/80 sm:text-sm shadow-sm hover:shadow-md transition-all duration-300"
               />
               {/* Search suggestions - could be expanded */}
