@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Upload, Image as ImageIcon } from 'lucide-react';
 import LoadingButton from '../ui/LoadingButton';
 import { adminProductService } from '../../services/adminProductService';
+import ImageUploadManager from './ImageUploadManager';
 import toast from 'react-hot-toast';
 
 const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories = [] }) => {
@@ -16,8 +17,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
     imageUrl: '',
     isActive: true
   });
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState('');
+  const [images, setImages] = useState([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -34,7 +34,28 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
         imageUrl: product.imageUrl || '',
         isActive: product.isActive !== undefined ? product.isActive : true
       });
-      setImagePreview(product.imageUrl || '');
+      
+      // Load existing images if any
+      if (product.images && product.images.length > 0) {
+        setImages(product.images.map(img => ({
+          id: img.id,
+          url: img.url,
+          isPrimary: img.isPrimary,
+          displayOrder: img.displayOrder,
+          isExisting: true
+        })));
+      } else if (product.imageUrl) {
+        // Backward compatibility - convert single image to images array
+        setImages([{
+          id: null,
+          url: product.imageUrl,
+          isPrimary: true,
+          displayOrder: 1,
+          isExisting: true
+        }]);
+      } else {
+        setImages([]);
+      }
     } else {
       setFormData({
         name: '',
@@ -47,9 +68,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
         imageUrl: '',
         isActive: true
       });
-      setImagePreview('');
+      setImages([]);
     }
-    setImageFile(null);
     setErrors({});
   }, [product, isOpen]);
 
@@ -69,39 +89,41 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
     }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        toast.error('Vui lòng chọn file hình ảnh');
-        return;
-      }
-      
-      // Validate file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Kích thước file không được vượt quá 5MB');
-        return;
-      }
 
-      setImageFile(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+
+  const uploadImages = async () => {
+    const newImages = images.filter(img => img.file); // Images with file property are new
+    
+    if (newImages.length === 0) {
+      // Return existing images in the correct format
+      return images.filter(img => !img.file).map((img, index) => ({
+        imageUrl: img.url,
+        isPrimary: img.isPrimary,
+        displayOrder: index + 1
+      }));
     }
-  };
-
-  const uploadImage = async () => {
-    if (!imageFile) return formData.imageUrl;
     
     try {
       setUploadingImage(true);
-      const response = await adminProductService.uploadProductImage(imageFile);
-      return response.imageUrl || response.url;
+      const uploadPromises = newImages.map(async (img, index) => {
+        const response = await adminProductService.uploadProductImage(img.file);
+        return {
+          imageUrl: response.imageUrl || response.url,
+          isPrimary: img.isPrimary,
+          displayOrder: images.indexOf(img) + 1
+        };
+      });
+
+      const uploadedImages = await Promise.all(uploadPromises);
+      
+      // Combine existing images with newly uploaded ones
+      const existingImages = images.filter(img => !img.file).map((img, index) => ({
+        imageUrl: img.url,
+        isPrimary: img.isPrimary,
+        displayOrder: images.indexOf(img) + 1
+      }));
+
+      return [...existingImages, ...uploadedImages].sort((a, b) => a.displayOrder - b.displayOrder);
     } catch (error) {
       toast.error('Lỗi khi tải lên hình ảnh');
       throw error;
@@ -109,6 +131,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
       setUploadingImage(false);
     }
   };
+
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -125,8 +149,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
       newErrors.price = 'Giá sản phẩm phải lớn hơn 0';
     }
 
-    if (formData.originalPrice && parseFloat(formData.originalPrice) <= parseFloat(formData.price)) {
-      newErrors.originalPrice = 'Giá gốc phải lớn hơn giá bán';
+    if (formData.originalPrice && parseFloat(formData.originalPrice) < parseFloat(formData.price)) {
+      newErrors.originalPrice = 'Giá gốc phải lớn hơn hoặc bằng giá bán';
     }
 
     if (!formData.stockQuantity || parseInt(formData.stockQuantity) < 0) {
@@ -149,18 +173,17 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
     }
 
     try {
-      // Upload image if needed
-      let imageUrl = formData.imageUrl;
-      if (imageFile) {
-        imageUrl = await uploadImage();
-      }
+      // Upload images if needed
+      const uploadedImages = await uploadImages();
 
       const submitData = {
         ...formData,
         price: parseFloat(formData.price),
         originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
         stockQuantity: parseInt(formData.stockQuantity),
-        imageUrl
+        images: uploadedImages,
+        // Keep imageUrl for backward compatibility
+        imageUrl: uploadedImages.find(img => img.isPrimary)?.imageUrl || uploadedImages[0]?.imageUrl || ''
       };
 
       await onSubmit(submitData);
@@ -323,57 +346,10 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
           </div>
 
           {/* Image Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Hình ảnh sản phẩm
-            </label>
-            <div className="mt-1 flex items-center space-x-4">
-              {imagePreview ? (
-                <div className="relative">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="h-20 w-20 object-cover rounded-lg border-2 border-gray-300"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImagePreview('');
-                      setImageFile(null);
-                      setFormData(prev => ({ ...prev, imageUrl: '' }));
-                    }}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ) : (
-                <div className="h-20 w-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                  <ImageIcon className="h-8 w-8 text-gray-400" />
-                </div>
-              )}
-              
-              <div className="flex-1">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="product-image"
-                />
-                <label
-                  htmlFor="product-image"
-                  className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Chọn hình ảnh
-                </label>
-                <p className="mt-1 text-xs text-gray-500">
-                  PNG, JPG, GIF tối đa 5MB
-                </p>
-              </div>
-            </div>
-          </div>
+          <ImageUploadManager 
+            images={images} 
+            onChange={setImages} 
+          />
 
           {/* Status */}
           <div className="flex items-center">
