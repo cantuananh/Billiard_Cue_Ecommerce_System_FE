@@ -54,9 +54,11 @@ const ProductManagement = () => {
   const fetchCategories = async () => {
     try {
       const response = await adminProductService.getCategories();
-      setCategories(response);
+      console.log('Categories response:', response); // Debug log
+      setCategories(Array.isArray(response) ? response : []);
     } catch (error) {
       console.error('Error fetching categories:', error);
+      setCategories([]); // Ensure categories is always an array
     }
   };
 
@@ -294,7 +296,7 @@ const ProductManagement = () => {
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               >
                 <option value="all">Tất cả danh mục</option>
-                {categories.map(category => (
+                {Array.isArray(categories) && categories.map(category => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>

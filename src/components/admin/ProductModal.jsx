@@ -91,46 +91,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
 
 
 
-  const uploadImages = async () => {
-    const newImages = images.filter(img => img.file); // Images with file property are new
-    
-    if (newImages.length === 0) {
-      // Return existing images in the correct format
-      return images.filter(img => !img.file).map((img, index) => ({
-        imageUrl: img.url,
-        isPrimary: img.isPrimary,
-        displayOrder: index + 1
-      }));
-    }
-    
-    try {
-      setUploadingImage(true);
-      const uploadPromises = newImages.map(async (img, index) => {
-        const response = await adminProductService.uploadProductImage(img.file);
-        return {
-          imageUrl: response.imageUrl || response.url,
-          isPrimary: img.isPrimary,
-          displayOrder: images.indexOf(img) + 1
-        };
-      });
-
-      const uploadedImages = await Promise.all(uploadPromises);
-      
-      // Combine existing images with newly uploaded ones
-      const existingImages = images.filter(img => !img.file).map((img, index) => ({
-        imageUrl: img.url,
-        isPrimary: img.isPrimary,
-        displayOrder: images.indexOf(img) + 1
-      }));
-
-      return [...existingImages, ...uploadedImages].sort((a, b) => a.displayOrder - b.displayOrder);
-    } catch (error) {
-      toast.error('Lỗi khi tải lên hình ảnh');
-      throw error;
-    } finally {
-      setUploadingImage(false);
-    }
-  };
+  
 
 
 
@@ -173,22 +134,28 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
     }
 
     try {
-      // Upload images if needed
-      const uploadedImages = await uploadImages();
+      // Images are already uploaded by ImageUploadManager
+      const validImages = images.filter(img => !img.uploading && img.serverUrl);
 
       const submitData = {
         ...formData,
         price: parseFloat(formData.price),
         originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
         stockQuantity: parseInt(formData.stockQuantity),
-        images: uploadedImages,
+        categoryId: parseInt(formData.categoryId),
+        images: validImages.map((img, index) => ({
+          imageUrl: img.serverUrl,
+          isPrimary: index === 0,
+          displayOrder: index + 1
+        })),
         // Keep imageUrl for backward compatibility
-        imageUrl: uploadedImages.find(img => img.isPrimary)?.imageUrl || uploadedImages[0]?.imageUrl || ''
+        imageUrl: validImages[0]?.serverUrl || ''
       };
 
       await onSubmit(submitData);
     } catch (error) {
       console.error('Error submitting product:', error);
+      toast.error('Có lỗi xảy ra khi lưu sản phẩm');
     }
   };
 

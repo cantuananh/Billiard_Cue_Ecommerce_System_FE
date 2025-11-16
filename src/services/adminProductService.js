@@ -47,17 +47,21 @@ export const adminProductService = {
     return response.data;
   },
 
-  // Upload product image
+  // Upload image
   uploadProductImage: async (file) => {
     const formData = new FormData();
     formData.append('file', file);
     
-    const response = await api.post('/admin/products/upload-image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    const response = await fetch('http://localhost:8080/api/admin/products/upload-image', {
+      method: 'POST',
+      body: formData,
     });
-    return response.data;
+    
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+    
+    return response.json();
   },
 
   // Get product categories

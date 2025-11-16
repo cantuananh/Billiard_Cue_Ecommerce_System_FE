@@ -1,4 +1,6 @@
 import { useState, useRef } from 'react';
+import { adminProductService } from '../../services/adminProductService';
+import toast from 'react-hot-toast';
 
 const ImageUploadManager = ({ images, onChange }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -19,47 +21,52 @@ const ImageUploadManager = ({ images, onChange }) => {
     handleFiles(files.filter(file => file.type.startsWith('image/')));
   };
 
-  // Process files and add to images array
-  const handleFiles = (files) => {
-    const validFiles = files.filter(file => {
+    // Process files and add to images array
+  const handleFiles = async (files) => {
+    let isFirstFile = images.length === 0; // Check if this is the first batch of images
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       if (file.size > 5 * 1024 * 1024) {
-        alert(`File ${file.name} quá lớn. Kích thước tối đa là 5MB.`);
-        return false;
+        toast.error(`File ${file.name} quá lớn. Kích thước tối đa là 5MB.`);
+        continue;
       }
-      return true;
-    });
 
-    if (validFiles.length === 0) return;
-
-    const newImages = [];
-    let loadedCount = 0;
-
-    validFiles.forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const newImage = {
-          id: Date.now() + Math.random() + index,
-          file: file,
-          url: e.target.result,
-          isPrimary: false // Will be set later
+      try {
+        // Show loading preview first
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const tempImage = {
+            id: Date.now() + Math.random(),
+            file: file,
+            url: e.target.result,
+            isPrimary: isFirstFile && i === 0, // Only first image of first batch is primary
+            uploading: true
+          };
+          onChange(prev => [...prev, tempImage]);
         };
-        newImages.push(newImage);
-        loadedCount++;
+        reader.readAsDataURL(file);
 
-        // When all files are loaded, update the images array
-        if (loadedCount === validFiles.length) {
-          const updatedImages = [...images, ...newImages];
-          
-          // Set first image as primary if no existing images
-          if (images.length === 0 && updatedImages.length > 0) {
-            updatedImages[0].isPrimary = true;
-          }
-          
-          onChange(updatedImages);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+        // Upload to server
+        const response = await adminProductService.uploadProductImage(file);
+        const serverUrl = `http://localhost:8080${response.imageUrl}`;
+
+        // Update with server URL
+        onChange(prev => prev.map(img => 
+          img.file === file ? {
+            ...img,
+            url: serverUrl,
+            serverUrl: serverUrl,
+            uploading: false
+          } : img
+        ));
+
+      } catch (error) {
+        toast.error(`Lỗi khi tải lên ${file.name}`);
+        // Remove failed upload
+        onChange(prev => prev.filter(img => img.file !== file));
+      }
+    }
   };
 
   // Handle drag start for reordering
@@ -200,12 +207,17 @@ const ImageUploadManager = ({ images, onChange }) => {
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleReorderDrop(e, index)}
               >
-                <div className="aspect-square">
+                <div className="aspect-square relative">
                   <img
                     src={image.url}
                     alt={`Product ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
+                  {image.uploading && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Primary Badge */}
