@@ -57,6 +57,7 @@ const CategoryModal = ({ mode, category, loading, onSave, onClose }) => {
       return;
     }
 
+    console.log('Form data to submit:', formData);
     onSave(formData);
   };
 
@@ -233,13 +234,13 @@ const CategoryModal = ({ mode, category, loading, onSave, onClose }) => {
               Hủy
             </button>
             {mode !== 'view' && (
-              <LoadingButton
+              <button
                 type="submit"
-                loading={loading}
+                disabled={loading}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {getButtonText()}
-              </LoadingButton>
+                {loading ? 'Đang xử lý...' : getButtonText()}
+              </button>
             )}
             {mode === 'view' && (
               <button

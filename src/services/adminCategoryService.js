@@ -27,7 +27,9 @@ export const adminCategoryService = {
 
   // Create new category
   createCategory: async (categoryData) => {
+    console.log('Sending category data:', categoryData);
     const response = await api.post('/admin/categories', categoryData);
+    console.log('Response:', response.data);
     return response.data;
   },
 

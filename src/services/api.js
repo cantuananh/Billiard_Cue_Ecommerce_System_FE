@@ -11,24 +11,33 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Request interceptor to add auth token - TEMPORARILY DISABLED
+// api.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem('accessToken');
+//     if (token && token !== 'null' && token !== 'undefined') {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 // Response interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Log detailed error info
+    console.error('API Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url,
+      method: error.config?.method,
+      requestData: error.config?.data
+    });
+
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {

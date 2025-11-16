@@ -69,7 +69,7 @@ export const adminProductService = {
 
   // Get product categories
   getCategories: async () => {
-    const response = await api.get('/admin/products/categories');
+    const response = await api.get('/admin/categories/active');
     return response.data;
   }
 };
