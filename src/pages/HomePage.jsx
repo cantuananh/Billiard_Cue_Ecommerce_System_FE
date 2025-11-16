@@ -5,12 +5,20 @@ import {
   ChevronDown, Menu, X, Award, Target, Zap, Heart,
   Users, TrendingUp, Play, ChevronRight, CheckCircle,
   MessageCircle, Phone, Mail, MapPin, Facebook, 
-  Instagram, Twitter, Youtube
+  Instagram, Twitter, Youtube, Loader2
 } from 'lucide-react';
+import productService from '../services/productService';
+import categoryService from '../services/categoryService';
+import toast from 'react-hot-toast';
 
 const HomePage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +26,63 @@ const HomePage = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Helper functions
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN').format(price);
+  };
+
+  const getProductImage = (product) => {
+    if (product.images && product.images.length > 0) {
+      return `http://localhost:8080/api/uploads/products/${product.images[0].fileName}`;
+    }
+    return '/placeholder-product.jpg'; // fallback image
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    try {
+      const results = await productService.searchProducts(searchQuery);
+      setProducts(results.content || results);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error('Không thể tìm kiếm sản phẩm');
+    }
+  };
+
+  // Fetch initial data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch data in parallel
+        const [productsResponse, categoriesResponse, featuredResponse] = await Promise.all([
+          productService.getProducts(0, 8), // Get first 8 products
+          categoryService.getAllCategories(),
+          productService.getFeaturedProducts(6) // Get 6 featured products
+        ]);
+
+        setProducts(productsResponse.content || productsResponse);
+        setCategories(categoriesResponse.content || categoriesResponse);
+        setFeaturedProducts(featuredResponse.content || featuredResponse);
+        
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast.error('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+        
+        // Set empty arrays on error to prevent crashes
+        setProducts([]);
+        setCategories([]);
+        setFeaturedProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -259,108 +324,100 @@ const HomePage = () => {
           </div>
 
           {/* Featured Products */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            {[
-              {
-                title: "Gậy Pool Predator Z3",
-                price: "15,500,000",
-                originalPrice: "18,000,000",
-                image: "🎱",
-                rating: 4.9,
-                reviews: 124,
-                badge: "Best Seller",
-                category: "Pool Cues"
-              },
-              {
-                title: "Gậy Carom Molinari SP13",
-                price: "12,800,000",
-                originalPrice: "15,200,000",
-                image: "🎯",
-                rating: 4.8,
-                reviews: 89,
-                badge: "Hot Deal",
-                category: "Carom Cues"
-              },
-              {
-                title: "Gậy Snooker McDermott G-Core",
-                price: "22,300,000",
-                originalPrice: "26,500,000",
-                image: "⚡",
-                rating: 5.0,
-                reviews: 67,
-                badge: "Premium",
-                category: "Snooker Cues"
-              },
-              {
-                title: "Gậy Break Poison VX5",
-                price: "8,900,000",
-                originalPrice: "10,500,000",
-                image: "💥",
-                rating: 4.7,
-                reviews: 156,
-                badge: "New",
-                category: "Break Cues"
-              }
-            ].map((product, index) => (
-              <div key={index} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
-                {/* Badge */}
-                <div className="absolute top-3 left-3 z-10">
-                  <span className={`px-2 py-1 rounded-md text-xs font-bold text-white ${
-                    product.badge === 'Best Seller' ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
-                    product.badge === 'Hot Deal' ? 'bg-gradient-to-r from-red-500 to-pink-500' :
-                    product.badge === 'New' ? 'bg-gradient-to-r from-green-500 to-emerald-500' :
-                    'bg-gradient-to-r from-purple-500 to-indigo-600'
-                  }`}>
-                    {product.badge}
-                  </span>
-                </div>
-
-                {/* Wishlist */}
-                <div className="absolute top-3 right-3 z-10">
-                  <Heart className="h-5 w-5 text-gray-400 hover:text-red-500 cursor-pointer transition-colors" />
-                </div>
-
-                {/* Product Image */}
-                <div className="relative h-48 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-6xl group-hover:scale-110 transition-transform duration-300">
-                      {product.image}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Product Info */}
-                <div className="p-4">
-                  <div className="text-xs text-gray-500 mb-1">{product.category}</div>
-                  
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
-                    {product.title}
-                  </h3>
-
-                  <div className="flex items-center mb-3">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-medium text-gray-700 ml-1">{product.rating}</span>
-                      <span className="text-sm text-gray-500 ml-1">({product.reviews})</span>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+              <span className="ml-2 text-gray-600">Đang tải sản phẩm...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+              {featuredProducts.map((product, index) => (
+                <div key={product.id} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+                  {/* Badge */}
+                  {product.discount > 0 && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="px-2 py-1 rounded-md text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500">
+                        -{product.discount}%
+                      </span>
                     </div>
+                  )}
+
+                  {/* Stock Badge */}
+                  {product.stock <= 5 && product.stock > 0 && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="px-2 py-1 rounded-md text-xs font-bold text-white bg-gradient-to-r from-yellow-400 to-orange-500">
+                        Còn {product.stock}
+                      </span>
+                    </div>
+                  )}
+
+                  {product.stock === 0 && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="px-2 py-1 rounded-md text-xs font-bold text-white bg-gray-500">
+                        Hết hàng
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Wishlist */}
+                  <div className="absolute top-3 right-3 z-10">
+                    <Heart className="h-5 w-5 text-gray-400 hover:text-red-500 cursor-pointer transition-colors" />
                   </div>
 
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-xl font-bold text-indigo-600">
-                      {product.price}₫
-                    </span>
-                    <span className="text-sm text-gray-400 line-through">
-                      {product.originalPrice}₫
-                    </span>
+                  {/* Product Image */}
+                  <div className="relative h-48 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+                    <img 
+                      src={getProductImage(product)} 
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src = '/placeholder-product.jpg';
+                      }}
+                    />
                   </div>
 
-                  <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
-                    Thêm vào giỏ
-                  </button>
+                  {/* Product Info */}
+                  <div className="p-4">
+                    <div className="text-xs text-gray-500 mb-1">{product.category?.name || 'Không có danh mục'}</div>
+                    
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                      {product.name}
+                    </h3>
+
+                    <div className="flex items-center mb-3">
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                        <span className="text-sm font-medium text-gray-700 ml-1">4.5</span>
+                        <span className="text-sm text-gray-500 ml-1">(0)</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-xl font-bold text-indigo-600">
+                        {formatPrice(product.price)}₫
+                      </span>
+                      {product.discount > 0 && (
+                        <span className="text-sm text-gray-400 line-through">
+                          {formatPrice(product.price / (1 - product.discount / 100))}₫
+                        </span>
+                      )}
+                    </div>
+
+                    <button 
+                      className={`w-full font-medium py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 ${
+                        product.stock > 0 
+                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                      disabled={product.stock === 0}
+                    >
+                      {product.stock > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* All Products Grid */}
           <div className="mb-8">
@@ -368,81 +425,86 @@ const HomePage = () => {
               <h3 className="text-2xl font-bold text-gray-900">Tất Cả Sản Phẩm</h3>
               <div className="flex items-center space-x-4">
                 <select className="border border-gray-300 rounded-lg px-4 py-2 bg-white">
-                  <option>Tất cả danh mục</option>
-                  <option>Gậy Pool</option>
-                  <option>Gậy Carom</option>
-                  <option>Gậy Snooker</option>
-                  <option>Gậy Break</option>
-                  <option>Phụ kiện</option>
+                  <option value="">Tất cả danh mục</option>
+                  {categories && Array.isArray(categories) && categories.map(category => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
+                  ))}
                 </select>
                 <select className="border border-gray-300 rounded-lg px-4 py-2 bg-white">
-                  <option>Sắp xếp theo</option>
-                  <option>Giá: Thấp đến cao</option>
-                  <option>Giá: Cao đến thấp</option>
-                  <option>Mới nhất</option>
-                  <option>Bán chạy</option>
+                  <option value="createdAt-desc">Mới nhất</option>
+                  <option value="price-asc">Giá: Thấp đến cao</option>
+                  <option value="price-desc">Giá: Cao đến thấp</option>
+                  <option value="name-asc">Tên: A-Z</option>
+                  <option value="name-desc">Tên: Z-A</option>
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {[
-                { title: "Gậy Pool Lucasi LZC21", price: "14,200,000", originalPrice: "16,800,000", image: "🎱", rating: 4.6, reviews: 98 },
-                { title: "Gậy Carom Fury CF-2", price: "9,800,000", originalPrice: "11,500,000", image: "🎯", rating: 4.5, reviews: 76 },
-                { title: "Gậy Snooker Riley R1", price: "18,900,000", originalPrice: "22,000,000", image: "⚡", rating: 4.8, reviews: 52 },
-                { title: "Gậy Break Viking B5221", price: "7,500,000", originalPrice: "8,900,000", image: "💥", rating: 4.4, reviews: 134 },
-                { title: "Gậy Jump Jacoby JCB-1", price: "11,200,000", originalPrice: "13,400,000", image: "🚀", rating: 4.7, reviews: 87 },
-                { title: "Gậy Pool Schon CX24", price: "16,800,000", originalPrice: "19,500,000", image: "🎱", rating: 4.9, reviews: 112 },
-                { title: "Gậy Carom Longoni S30", price: "13,500,000", originalPrice: "15,800,000", image: "🎯", rating: 4.6, reviews: 93 },
-                { title: "Gậy Snooker Peradon P3", price: "21,200,000", originalPrice: "24,800,000", image: "⚡", rating: 4.8, reviews: 68 },
-                { title: "Gậy Break PowerGlide PG1", price: "6,900,000", originalPrice: "8,200,000", image: "💥", rating: 4.3, reviews: 156 },
-                { title: "Gậy Jump Action ACT147", price: "10,500,000", originalPrice: "12,300,000", image: "🚀", rating: 4.5, reviews: 74 },
-                { title: "Gậy Pool Meucci MEU21", price: "17,500,000", originalPrice: "20,300,000", image: "🎱", rating: 4.7, reviews: 89 },
-                { title: "Gậy Carom Adam X2 Pro", price: "12,800,000", originalPrice: "15,100,000", image: "🎯", rating: 4.8, reviews: 67 },
-                { title: "Gậy Snooker Dufferin DF4", price: "19,800,000", originalPrice: "23,200,000", image: "⚡", rating: 4.6, reviews: 83 },
-                { title: "Gậy Break Poison VX4 BRK", price: "8,200,000", originalPrice: "9,700,000", image: "💥", rating: 4.4, reviews: 145 },
-                { title: "Gậy Jump Predator Air2", price: "13,900,000", originalPrice: "16,200,000", image: "🚀", rating: 4.9, reviews: 91 }
-              ].map((product, index) => (
-                <div key={index} className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
-                  {/* Product Image */}
-                  <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-4xl group-hover:scale-110 transition-transform duration-300">
-                        {product.image}
-                      </span>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <Heart className="h-4 w-4 text-gray-400 hover:text-red-500 cursor-pointer transition-colors" />
-                    </div>
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="p-3">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
-                      {product.title}
-                    </h4>
-
-                    <div className="flex items-center mb-2">
-                      <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                      <span className="text-xs text-gray-600 ml-1">{product.rating}</span>
-                      <span className="text-xs text-gray-500 ml-1">({product.reviews})</span>
-                    </div>
-
-                    <div className="mb-3">
-                      <div className="text-lg font-bold text-indigo-600 mb-1">
-                        {product.price}₫
-                      </div>
-                      <div className="text-xs text-gray-400 line-through">
-                        {product.originalPrice}₫
-                      </div>
-                    </div>
-
-                    <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-3 rounded-md transition-colors duration-300 text-sm">
-                      Mua ngay
-                    </button>
-                  </div>
+              {loading ? (
+                <div className="col-span-full flex justify-center items-center py-12">
+                  <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
+                  <span className="ml-2 text-gray-600">Đang tải...</span>
                 </div>
-              ))}
+              ) : products.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-gray-500">Không có sản phẩm nào</p>
+                </div>
+              ) : (
+                products.map((product, index) => (
+                  <div key={product.id} className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+                    {/* Product Image */}
+                    <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100">
+                      <img 
+                        src={getProductImage(product)} 
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          e.target.src = '/placeholder-product.jpg';
+                        }}
+                      />
+                      <div className="absolute top-2 right-2">
+                        <Heart className="h-4 w-4 text-gray-400 hover:text-red-500 cursor-pointer transition-colors" />
+                      </div>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="p-3">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                        {product.name}
+                      </h4>
+
+                      <div className="flex items-center mb-2">
+                        <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                        <span className="text-xs text-gray-600 ml-1">4.5</span>
+                        <span className="text-xs text-gray-500 ml-1">(0)</span>
+                      </div>
+
+                      <div className="mb-3">
+                        <div className="text-lg font-bold text-indigo-600 mb-1">
+                          {formatPrice(product.price)}₫
+                        </div>
+                        {product.discount > 0 && (
+                          <div className="text-xs text-gray-400 line-through">
+                            {formatPrice(product.price / (1 - product.discount / 100))}₫
+                          </div>
+                        )}
+                      </div>
+
+                      <button 
+                        className={`w-full font-medium py-2 px-3 rounded-md transition-colors duration-300 text-sm ${
+                          product.stock > 0 
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                        disabled={product.stock === 0}
+                      >
+                        {product.stock > 0 ? 'Mua ngay' : 'Hết hàng'}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
