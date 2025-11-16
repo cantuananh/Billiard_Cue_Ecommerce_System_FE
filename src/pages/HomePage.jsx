@@ -407,8 +407,12 @@ const HomePage = () => {
                     <div className="flex items-center mb-3">
                       <div className="flex items-center">
                         <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="text-sm font-medium text-gray-700 ml-1">4.5</span>
-                        <span className="text-sm text-gray-500 ml-1">(0)</span>
+                        <span className="text-sm font-medium text-gray-700 ml-1">
+                          {product.rating ? parseFloat(product.rating).toFixed(1) : '0.0'}
+                        </span>
+                        <span className="text-sm text-gray-500 ml-1">
+                          ({product.reviewCount || 0})
+                        </span>
                       </div>
                     </div>
 
@@ -496,8 +500,12 @@ const HomePage = () => {
 
                       <div className="flex items-center mb-2">
                         <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                        <span className="text-xs text-gray-600 ml-1">4.5</span>
-                        <span className="text-xs text-gray-500 ml-1">(0)</span>
+                        <span className="text-xs text-gray-600 ml-1">
+                          {product.rating ? parseFloat(product.rating).toFixed(1) : '0.0'}
+                        </span>
+                        <span className="text-xs text-gray-500 ml-1">
+                          ({product.reviewCount || 0})
+                        </span>
                       </div>
 
                       <div className="mb-3">
