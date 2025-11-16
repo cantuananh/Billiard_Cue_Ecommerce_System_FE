@@ -8,8 +8,11 @@ export const adminProductService = {
     if (params.page !== undefined) queryParams.append('page', params.page);
     if (params.size !== undefined) queryParams.append('size', params.size);
     if (params.search) queryParams.append('search', params.search);
-    if (params.category) queryParams.append('category', params.category);
-    if (params.status !== undefined) queryParams.append('status', params.status);
+    if (params.category) queryParams.append('categoryId', params.category);
+    // Only add isActive if it's a boolean (not null or undefined)
+    if (params.status !== null && params.status !== undefined) {
+      queryParams.append('isActive', params.status);
+    }
     if (params.sortBy) queryParams.append('sortBy', params.sortBy);
     if (params.sortDir) queryParams.append('sortDir', params.sortDir);
     
