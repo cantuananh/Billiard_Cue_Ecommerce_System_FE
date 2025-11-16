@@ -39,7 +39,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
       if (product.images && product.images.length > 0) {
         setImages(product.images.map(img => ({
           id: img.id,
-          url: img.url,
+          url: img.imageUrl, // Fixed: use imageUrl instead of url
+          serverUrl: img.imageUrl, // Add serverUrl for consistency
           isPrimary: img.isPrimary,
           displayOrder: img.displayOrder,
           isExisting: true
@@ -49,6 +50,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
         setImages([{
           id: null,
           url: product.imageUrl,
+          serverUrl: product.imageUrl, // Add serverUrl for consistency
           isPrimary: true,
           displayOrder: 1,
           isExisting: true

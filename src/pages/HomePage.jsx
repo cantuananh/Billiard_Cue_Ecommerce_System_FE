@@ -34,10 +34,22 @@ const HomePage = () => {
   };
 
   const getProductImage = (product) => {
-    if (product.images && product.images.length > 0) {
-      return `http://localhost:8080/api/uploads/products/${product.images[0].fileName}`;
+    // Try primaryImageUrl first
+    if (product.primaryImageUrl) {
+      return product.primaryImageUrl;
     }
-    return '/placeholder-product.jpg'; // fallback image
+    
+    // Then try images array
+    if (product.images && product.images.length > 0) {
+      return product.images[0].imageUrl;
+    }
+    
+    // Fallback to imageUrl field
+    if (product.imageUrl) {
+      return product.imageUrl;
+    }
+    
+    return '/placeholder-product.svg'; // fallback image
   };
 
   const handleSearch = async () => {
@@ -343,10 +355,18 @@ const HomePage = () => {
                   )}
 
                   {/* Stock Badge */}
-                  {product.stock <= 5 && product.stock > 0 && (
+                  {product.stock !== null && product.stock <= 5 && product.stock > 0 && (
                     <div className="absolute top-3 left-3 z-10">
                       <span className="px-2 py-1 rounded-md text-xs font-bold text-white bg-gradient-to-r from-yellow-400 to-orange-500">
                         Còn {product.stock}
+                      </span>
+                    </div>
+                  )}
+
+                  {product.stock === null && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="px-2 py-1 rounded-md text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-500">
+                        Có sẵn
                       </span>
                     </div>
                   )}
@@ -371,7 +391,7 @@ const HomePage = () => {
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       onError={(e) => {
-                        e.target.src = '/placeholder-product.jpg';
+                        e.target.src = '/placeholder-product.svg';
                       }}
                     />
                   </div>
@@ -405,13 +425,13 @@ const HomePage = () => {
 
                     <button 
                       className={`w-full font-medium py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 ${
-                        product.stock > 0 
+                        (product.stock === null || product.stock > 0)
                           ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                       disabled={product.stock === 0}
                     >
-                      {product.stock > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}
+                      {(product.stock === null || product.stock > 0) ? 'Thêm vào giỏ' : 'Hết hàng'}
                     </button>
                   </div>
                 </div>
@@ -460,7 +480,7 @@ const HomePage = () => {
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         onError={(e) => {
-                          e.target.src = '/placeholder-product.jpg';
+                          e.target.src = '/placeholder-product.svg';
                         }}
                       />
                       <div className="absolute top-2 right-2">
@@ -493,13 +513,13 @@ const HomePage = () => {
 
                       <button 
                         className={`w-full font-medium py-2 px-3 rounded-md transition-colors duration-300 text-sm ${
-                          product.stock > 0 
+                          (product.stock === null || product.stock > 0)
                             ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         }`}
                         disabled={product.stock === 0}
                       >
-                        {product.stock > 0 ? 'Mua ngay' : 'Hết hàng'}
+                        {(product.stock === null || product.stock > 0) ? 'Mua ngay' : 'Hết hàng'}
                       </button>
                     </div>
                   </div>

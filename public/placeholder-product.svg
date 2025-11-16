@@ -1,0 +1,7 @@
+<!-- Simple SVG placeholder for products -->
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#f3f4f6" stroke="#d1d5db" stroke-width="2"/>
+  <text x="100" y="100" text-anchor="middle" dy=".3em" font-family="Arial, sans-serif" font-size="14" fill="#6b7280">
+    Không có hình ảnh
+  </text>
+</svg>
