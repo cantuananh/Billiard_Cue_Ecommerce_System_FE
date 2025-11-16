@@ -10,6 +10,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import ProductManagement from './pages/admin/ProductManagement';
+import CategoryManagement from './pages/admin/CategoryManagement';
 import './App.css';
 
 // Protected Route Component
@@ -90,6 +91,7 @@ function App() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="products" element={<ProductManagement />} />
+            <Route path="categories" element={<CategoryManagement />} />
             <Route path="orders" element={<div className="p-6">Quản lý đơn hàng - Coming soon</div>} />
             <Route path="analytics" element={<div className="p-6">Thống kê - Coming soon</div>} />
             <Route path="settings" element={<div className="p-6">Cài đặt - Coming soon</div>} />
