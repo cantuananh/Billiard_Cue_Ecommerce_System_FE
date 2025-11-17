@@ -100,10 +100,11 @@ const ReviewSection = ({ product }) => {
   return (
     <div className="bg-white border-t">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Đánh giá sản phẩm</h2>
-        
-        {/* Rating Overview */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="bg-white rounded-lg border p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Đánh giá sản phẩm</h2>
+          
+          {/* Rating Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Overall Rating */}
           <div className="text-center">
             <div className="text-4xl font-bold text-gray-900 mb-2">
@@ -272,12 +273,13 @@ const ReviewSection = ({ product }) => {
 
         {/* Write Review Button */}
         <div className="mt-8 pt-6 border-t">
-          <button 
+                    <button 
             onClick={() => setShowWriteReview(true)}
             className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-300"
           >
             Viết đánh giá
           </button>
+        </div>
         </div>
       </div>
 
