@@ -421,7 +421,7 @@ const HomePage = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
               {featuredProducts.map((product, index) => (
-                <div key={product.id} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
+                <div key={product.id} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 cursor-pointer flex flex-col h-full" onClick={() => navigate(`/product/${product.id}`)}>
                   {/* Badge */}
                   {product.discount > 0 && (
                     <div className="absolute top-3 left-3 z-10">
@@ -474,10 +474,19 @@ const HomePage = () => {
                   </div>
 
                   {/* Product Info */}
-                  <div className="p-4">
+                  <div className="p-4 flex flex-col flex-grow">
                     <div className="text-xs text-gray-500 mb-1">{product.category?.name || 'Không có danh mục'}</div>
                     
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors" 
+                        style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          minHeight: '3.5rem',
+                          lineHeight: '1.75rem'
+                        }}>
                       {product.name}
                     </h3>
 
@@ -493,7 +502,7 @@ const HomePage = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-2 mb-4 flex-grow">
                       <span className="text-xl font-bold text-indigo-600">
                         {formatPrice(product.price)}₫
                       </span>
@@ -557,7 +566,7 @@ const HomePage = () => {
                 </div>
               ) : (
                 products.map((product, index) => (
-                  <div key={product.id} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
+                  <div key={product.id} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 cursor-pointer flex flex-col h-full" onClick={() => navigate(`/product/${product.id}`)}>
                     {/* Badge */}
                     {product.discount > 0 && (
                       <div className="absolute top-3 left-3 z-10">
@@ -610,10 +619,19 @@ const HomePage = () => {
                     </div>
 
                     {/* Product Info */}
-                    <div className="p-4">
+                    <div className="p-4 flex flex-col flex-grow">
                       <div className="text-xs text-gray-500 mb-1">{product.category?.name || 'Không có danh mục'}</div>
                       
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors" 
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            minHeight: '3.5rem',
+                            lineHeight: '1.75rem'
+                          }}>
                         {product.name}
                       </h3>
 
@@ -629,7 +647,7 @@ const HomePage = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-2 mb-4 flex-grow">
                         <span className="text-xl font-bold text-indigo-600">
                           {formatPrice(product.price)}₫
                         </span>
