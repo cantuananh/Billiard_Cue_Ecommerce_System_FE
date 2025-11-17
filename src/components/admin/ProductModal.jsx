@@ -345,7 +345,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
             </button>
             <LoadingButton
               type="submit"
-              loading={loading || uploadingImage}
+              isLoading={loading || uploadingImage}
               className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700"
             >
               {product ? 'Cập nhật' : 'Tạo mới'}

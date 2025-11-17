@@ -2,7 +2,16 @@ import api from './api';
 
 const productService = {
   // Get all products with pagination and filters (public API)
-  getProducts: async (page = 0, size = 20, categoryId = null, search = '', sortBy = 'createdAt', sortDir = 'desc') => {
+  getProducts: async (page = 0, size = 20, filters = {}) => {
+    const {
+      categoryId = null,
+      search = '',
+      sortBy = 'createdAt',
+      sortDir = 'desc',
+      minPrice = null,
+      maxPrice = null
+    } = filters;
+
     const params = new URLSearchParams({
       page: page.toString(),
       size: size.toString(),
@@ -12,6 +21,8 @@ const productService = {
     
     if (categoryId) params.append('categoryId', categoryId);
     if (search) params.append('search', search);
+    if (minPrice !== null && minPrice >= 0) params.append('minPrice', minPrice.toString());
+    if (maxPrice !== null && maxPrice >= 0) params.append('maxPrice', maxPrice.toString());
     
     const response = await api.get(`/public/products?${params.toString()}`);
     return response.data;
