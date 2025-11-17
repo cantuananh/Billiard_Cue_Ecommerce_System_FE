@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, UserPlus, LogIn, Star, Shield, Truck, 
   ChevronDown, Menu, X, Award, Target, Zap, Heart,
@@ -12,6 +12,7 @@ import categoryService from '../services/categoryService';
 import toast from 'react-hot-toast';
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [products, setProducts] = useState([]);
@@ -344,7 +345,7 @@ const HomePage = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
               {featuredProducts.map((product, index) => (
-                <div key={product.id} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+                <div key={product.id} className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
                   {/* Badge */}
                   {product.discount > 0 && (
                     <div className="absolute top-3 left-3 z-10">
@@ -380,7 +381,7 @@ const HomePage = () => {
                   )}
 
                   {/* Wishlist */}
-                  <div className="absolute top-3 right-3 z-10">
+                  <div className="absolute top-3 right-3 z-10" onClick={(e) => e.stopPropagation()}>
                     <Heart className="h-5 w-5 text-gray-400 hover:text-red-500 cursor-pointer transition-colors" />
                   </div>
 
@@ -428,6 +429,7 @@ const HomePage = () => {
                     </div>
 
                     <button 
+                      onClick={(e) => e.stopPropagation()}
                       className={`w-full font-medium py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 ${
                         (product.stock === null || product.stock > 0)
                           ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
@@ -476,7 +478,7 @@ const HomePage = () => {
                 </div>
               ) : (
                 products.map((product, index) => (
-                  <div key={product.id} className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+                  <div key={product.id} className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
                     {/* Product Image */}
                     <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100">
                       <img 
@@ -487,7 +489,7 @@ const HomePage = () => {
                           e.target.src = '/placeholder-product.svg';
                         }}
                       />
-                      <div className="absolute top-2 right-2">
+                      <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
                         <Heart className="h-4 w-4 text-gray-400 hover:text-red-500 cursor-pointer transition-colors" />
                       </div>
                     </div>
@@ -520,6 +522,7 @@ const HomePage = () => {
                       </div>
 
                       <button 
+                        onClick={(e) => e.stopPropagation()}
                         className={`w-full font-medium py-2 px-3 rounded-md transition-colors duration-300 text-sm ${
                           (product.stock === null || product.stock > 0)
                             ? 'bg-indigo-600 hover:bg-indigo-700 text-white'

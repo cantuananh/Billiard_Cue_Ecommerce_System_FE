@@ -5,6 +5,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import ForgotPassword from './components/auth/ForgotPassword';
 import HomePage from './pages/HomePage';
+import ProductDetail from './pages/ProductDetail';
 import Dashboard from './pages/Dashboard';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -50,6 +51,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
           
           {/* Auth Routes */}
           <Route 
