@@ -25,10 +25,19 @@ const Register = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await authService.register(data);
-      toast.success(response.message || 'Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.');
+      const payload = {
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        fullName: `${data.firstName} ${data.lastName}`.trim(),
+        phoneNumber: data.phoneNumber || '',
+      };
+      const response = await authService.register(payload);
+      toast.success(response.message || 'Đăng ký thành công! Vui lòng đăng nhập.');
       navigate('/login');
     } catch (error) {
+      const msg = error.response?.data?.message || error.response?.data?.error || 'Đăng ký thất bại. Vui lòng thử lại.';
+      toast.error(msg);
       console.error('Register error:', error);
     } finally {
       setIsLoading(false);
