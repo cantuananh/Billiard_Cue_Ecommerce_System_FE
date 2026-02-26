@@ -69,10 +69,15 @@ api.interceptors.response.use(
     }
 
     // Show error toast for other errors
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
-    } else {
-      toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
+    // Skip toast for disabled account on login — Login.jsx will redirect to dedicated page
+    const isDisabledError = error.response?.data?.message?.toLowerCase().includes('disabled');
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+    if (!(isDisabledError && isLoginRequest)) {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
+      }
     }
 
     return Promise.reject(error);

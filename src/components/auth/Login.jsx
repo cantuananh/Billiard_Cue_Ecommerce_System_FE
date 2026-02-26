@@ -103,6 +103,10 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
+      const msg = error.response?.data?.message || '';
+      if (msg.toLowerCase().includes('disabled')) {
+        navigate('/account-disabled');
+      }
     } finally {
       setIsLoading(false);
     }

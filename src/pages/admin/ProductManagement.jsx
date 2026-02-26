@@ -63,13 +63,14 @@ const ProductManagement = () => {
   };
 
   // Fetch products data
-  const fetchProducts = async (page = currentPage) => {
+  // searchQuery: nếu truyền vào thì dùng (dùng khi Enter), không thì dùng debouncedSearchTerm
+  const fetchProducts = async (page = currentPage, searchQuery = debouncedSearchTerm) => {
     try {
       setLoading(true);
       const params = {
         page,
         size: 10,
-        search: debouncedSearchTerm, // Sử dụng debounced search term
+        search: searchQuery,
         category: filterCategory === 'all' ? undefined : filterCategory,
         status: filterStatus,
         sortBy: 'createdAt',
@@ -88,7 +89,7 @@ const ProductManagement = () => {
 
   // Effect để fetch data khi debounced search term thay đổi
   useEffect(() => {
-    fetchProducts(0);
+    fetchProducts(0, debouncedSearchTerm);
     setCurrentPage(0);
   }, [debouncedSearchTerm, filterCategory, filterStatus]);
 
@@ -97,9 +98,9 @@ const ProductManagement = () => {
   };
 
   const handleSearchKeyPress = (e) => {
-    // Nếu nhấn Enter, tìm kiếm ngay lập tức
+    // Nếu nhấn Enter, tìm kiếm ngay lập tức với searchTerm hiện tại (không chờ debounce)
     if (e.key === 'Enter') {
-      fetchProducts(0);
+      fetchProducts(0, searchTerm);
       setCurrentPage(0);
     }
   };
