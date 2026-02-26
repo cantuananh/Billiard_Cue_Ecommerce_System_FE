@@ -12,6 +12,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import AccountDisabledPage from './pages/AccountDisabledPage';
+import ContactPage from './pages/ContactPage';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
@@ -90,6 +91,7 @@ function App() {
           <Route path="/my-orders" element={<MyOrdersPage />} />
           <Route path="/my-orders/:orderId" element={<MyOrdersPage />} />
           <Route path="/account-disabled" element={<AccountDisabledPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           
           {/* Auth Routes */}
           <Route 

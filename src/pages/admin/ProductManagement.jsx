@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import ProductModal from '../../components/admin/ProductModal';
+import ProductDetailModal from '../../components/admin/ProductDetailModal';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import { adminProductService } from '../../services/adminProductService';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -44,6 +45,7 @@ const ProductManagement = () => {
   
   // Modal states
   const [productModal, setProductModal] = useState({ isOpen: false, product: null, loading: false });
+  const [viewModal, setViewModal] = useState({ isOpen: false, product: null });
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, product: null, action: null, loading: false });
 
   // Fetch categories on component mount
@@ -133,6 +135,10 @@ const ProductManagement = () => {
   // Product CRUD operations
   const handleCreateProduct = () => {
     setProductModal({ isOpen: true, product: null, loading: false });
+  };
+
+  const handleViewProduct = (product) => {
+    setViewModal({ isOpen: true, product });
   };
 
   const handleEditProduct = (product) => {
@@ -360,9 +366,6 @@ const ProductManagement = () => {
                   Sản phẩm
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Danh mục
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Giá
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -409,17 +412,17 @@ const ProductManagement = () => {
                         <div className="text-sm font-medium text-gray-900">
                           {product.name}
                         </div>
-                        <div className="text-sm text-gray-500">#{product.sku || product.id}</div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-sm text-gray-500">#{product.sku || product.id}</span>
+                          <span className="inline-flex px-1.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                            {getCategoryName(product.categoryId)}
+                          </span>
+                        </div>
                         <div className="text-xs text-gray-400 max-w-xs truncate">
                           {product.description}
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {getCategoryName(product.categoryId)}
-                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
@@ -465,8 +468,15 @@ const ProductManagement = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
                       <button 
+                        onClick={() => handleViewProduct(product)}
+                        className="p-1.5 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
+                        title="Xem chi tiết"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button 
                         onClick={() => handleEditProduct(product)}
-                        className="text-gray-600 hover:text-gray-900"
+                        className="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
                         title="Chỉnh sửa"
                       >
                         <Edit className="h-4 w-4" />
@@ -558,6 +568,14 @@ const ProductManagement = () => {
           </div>
         </div>
       </div>
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        isOpen={viewModal.isOpen}
+        onClose={() => setViewModal({ isOpen: false, product: null })}
+        product={viewModal.product}
+        onEdit={(product) => handleEditProduct(product)}
+      />
 
       {/* Product Modal */}
       <ProductModal

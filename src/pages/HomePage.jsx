@@ -246,7 +246,7 @@ const HomePage = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 bg-white">
+      <section id="brands" className="scroll-mt-20 py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -315,7 +315,7 @@ const HomePage = () => {
       </section>
 
       {/* Product Showcase Section */}
-      <section id="products" className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section id="products" className="scroll-mt-20 py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -651,7 +651,7 @@ const HomePage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50">
+      <section id="about" className="scroll-mt-20 py-20 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-lg text-indigo-600 rounded-full text-sm font-medium mb-4">
@@ -745,7 +745,7 @@ const HomePage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-indigo-900 text-white overflow-hidden">
+      <section id="contact" className="scroll-mt-20 py-20 bg-gradient-to-b from-gray-900 to-indigo-900 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-lg text-yellow-300 rounded-full text-sm font-medium mb-4">
