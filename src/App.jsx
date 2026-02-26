@@ -7,12 +7,18 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import HomePage from './pages/HomePage';
 import ProductDetail from './pages/ProductDetail';
 import Dashboard from './pages/Dashboard';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+import MyOrdersPage from './pages/MyOrdersPage';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import ProductManagement from './pages/admin/ProductManagement';
 import CategoryManagement from './pages/admin/CategoryManagement';
 import OrderManagement from './pages/admin/OrderManagement';
+import CartDrawer from './components/CartDrawer';
+import { CartProvider, useCartContext } from './context/CartContext';
 import './App.css';
 
 // Protected Route Component
@@ -51,14 +57,37 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
+// CartDrawer wrapper to access context inside Router
+const CartDrawerWrapper = () => {
+  const { isCartOpen, closeCart, cartItems, updateQuantity, removeFromCart, totalItems, totalPrice } = useCartContext();
+  return (
+    <CartDrawer
+      isOpen={isCartOpen}
+      onClose={closeCart}
+      cartItems={cartItems}
+      updateQuantity={updateQuantity}
+      removeFromCart={removeFromCart}
+      totalItems={totalItems}
+      totalPrice={totalPrice}
+    />
+  );
+};
+
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Routes>
+    <CartProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
+          <CartDrawerWrapper />
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-success" element={<OrderSuccessPage />} />
+          <Route path="/my-orders" element={<MyOrdersPage />} />
+          <Route path="/my-orders/:orderId" element={<MyOrdersPage />} />
           
           {/* Auth Routes */}
           <Route 
@@ -140,6 +169,7 @@ function App() {
         />
       </div>
     </Router>
+    </CartProvider>
   );
 }
 

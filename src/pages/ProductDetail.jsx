@@ -18,10 +18,12 @@ import Layout from '../components/Layout';
 import ReviewSection from '../components/ReviewSection';
 import productService from '../services/productService';
 import toast from 'react-hot-toast';
+import { useCartContext } from '../context/CartContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addToCart, openCart } = useCartContext();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,13 +60,14 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
+    addToCart(product, quantity);
+    toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
+    openCart();
   };
 
   const handleBuyNow = () => {
-    // TODO: Implement buy now functionality
-    toast.success('Chuyển đến trang thanh toán');
+    addToCart(product, quantity);
+    navigate('/cart');
   };
 
   const formatPrice = (price) => {

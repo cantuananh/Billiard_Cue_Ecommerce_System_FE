@@ -1,32 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  ShoppingBag, UserPlus, LogIn, Star, Shield, Truck, 
-  ChevronDown, Menu, X, Award, Target, Zap, Heart,
+  ShoppingBag, Star, Shield, Truck, UserPlus,
+  ChevronDown, Award, Target, Zap, Heart,
   Users, TrendingUp, Play, ChevronRight, CheckCircle,
-  MessageCircle, Phone, Mail, MapPin, Facebook, 
-  Instagram, Twitter, Youtube, Loader2
+  MessageCircle, Phone, Loader2, ShoppingCart
 } from 'lucide-react';
 import productService from '../services/productService';
 import categoryService from '../services/categoryService';
 import ProductFilter from '../components/ProductFilterSimple';
 import Pagination from '../components/Pagination';
+import SiteHeader from '../components/SiteHeader';
+import SiteFooter from '../components/SiteFooter';
 import toast from 'react-hot-toast';
+import { useCartContext } from '../context/CartContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
-  const isLoggedIn = !!localStorage.getItem('accessToken');
+  const { addToCart, openCart } = useCartContext();
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-    navigate('/');
-    window.location.reload();
+  const handleAddToCart = (e, product) => {
+    e.stopPropagation();
+    const cartProduct = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      primaryImageUrl: getProductImage(product),
+      stockQuantity: product.stock ?? product.stockQuantity ?? 99,
+    };
+    addToCart(cartProduct, 1);
+    toast.success('Đã thêm vào giỏ hàng!');
+    openCart();
   };
-  const [isScrolled, setIsScrolled] = useState(false);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -43,14 +49,6 @@ const HomePage = () => {
     sortBy: 'createdAt',
     sortDir: 'desc'
   });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Helper functions
   const formatPrice = (price) => {
@@ -154,118 +152,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-lg shadow-lg' : 'bg-white/90'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center group cursor-pointer">
-              <div className="relative">
-                <ShoppingBag className="h-8 w-8 text-indigo-600 group-hover:scale-110 transition-transform duration-300" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full animate-pulse"></div>
-              </div>
-              <span className="ml-3 text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                BilliardCue Store
-              </span>
-            </div>
-            
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              {['Sản phẩm', 'Thương hiệu', 'Giới thiệu', 'Liên hệ'].map((item, index) => (
-                <a
-                  key={index}
-                  href={`#${item.toLowerCase()}`}
-                  className="relative text-gray-600 hover:text-indigo-600 font-medium transition-all duration-300 group"
-                >
-                  {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
-                </a>
-              ))}
-            </nav>
-            
-            {/* Auth Buttons & Mobile Menu */}
-            <div className="flex items-center space-x-4">
-              <div className="hidden sm:flex items-center space-x-3">
-                {isLoggedIn ? (
-                  <>
-                    <span className="text-gray-600 font-medium text-sm">
-                      Xin chào, {currentUser?.fullName || 'Khách hàng'}
-                    </span>
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center text-gray-600 hover:text-red-600 font-medium transition-all duration-300 group"
-                    >
-                      <LogIn className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform rotate-180" />
-                      Đăng xuất
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-all duration-300 group"
-                    >
-                      <LogIn className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-                      Đăng nhập
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-                    >
-                      <UserPlus className="h-4 w-4 mr-1" />
-                      Đăng ký
-                    </Link>
-                  </>
-                )}
-              </div>
-              
-              {/* Mobile menu button */}
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-lg border-t shadow-lg">
-            <div className="px-4 py-6 space-y-4">
-              {['Sản phẩm', 'Thương hiệu', 'Giới thiệu', 'Liên hệ'].map((item, index) => (
-                <a
-                  key={index}
-                  href={`#${item.toLowerCase()}`}
-                  className="block text-gray-600 hover:text-indigo-600 font-medium py-2 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item}
-                </a>
-              ))}
-              <div className="flex flex-col space-y-3 pt-4 border-t">
-                <Link
-                  to="/login"
-                  className="flex items-center justify-center text-gray-600 hover:text-indigo-600 font-medium py-2 transition-colors"
-                >
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Đăng nhập
-                </Link>
-                <Link
-                  to="/register"
-                  className="flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium py-3 px-6 rounded-full transition-all duration-300"
-                >
-                  <UserPlus className="h-4 w-4 mr-1" />
-                  Đăng ký
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      <SiteHeader />
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -541,15 +428,16 @@ const HomePage = () => {
                     </div>
 
                     <button 
-                      onClick={(e) => e.stopPropagation()}
-                      className={`w-full font-medium py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 ${
+                      onClick={(e) => handleAddToCart(e, product)}
+                      className={`w-full font-medium py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 ${
                         (product.stock === null || product.stock > 0)
                           ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                       disabled={product.stock === 0}
                     >
-                      {(product.stock === null || product.stock > 0) ? 'Thêm vào giỏ' : 'Hết hàng'}
+                      <ShoppingCart className="h-4 w-4" />
+                      <span>{(product.stock === null || product.stock > 0) ? 'Thêm vào giỏ' : 'Hết hàng'}</span>
                     </button>
                   </div>
                 </div>
@@ -686,15 +574,16 @@ const HomePage = () => {
                       </div>
 
                       <button 
-                        onClick={(e) => e.stopPropagation()}
-                        className={`w-full font-medium py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 ${
+                        onClick={(e) => handleAddToCart(e, product)}
+                        className={`w-full font-medium py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 ${
                           (product.stock === null || product.stock > 0)
                             ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         }`}
                         disabled={product.stock === 0}
                       >
-                        {(product.stock === null || product.stock > 0) ? 'Thêm vào giỏ' : 'Hết hàng'}
+                        <ShoppingCart className="h-4 w-4" />
+                        <span>{(product.stock === null || product.stock > 0) ? 'Thêm vào giỏ' : 'Hết hàng'}</span>
                       </button>
                     </div>
                   </div>
@@ -1007,157 +896,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-b from-gray-900 to-black text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          {/* Main footer content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {/* Company Info */}
-            <div className="lg:col-span-1">
-              <div className="flex items-center mb-6">
-                <div className="relative">
-                  <ShoppingBag className="h-10 w-10 text-indigo-400" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full animate-pulse"></div>
-                </div>
-                <span className="ml-3 text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                  BilliardCue Store
-                </span>
-              </div>
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                Cửa hàng gậy bi-a uy tín hàng đầu Việt Nam với hơn 10 năm kinh nghiệm. 
-                Chúng tôi cam kết mang đến những sản phẩm chất lượng cao nhất.
-              </p>
-              
-              {/* Social Links */}
-              <div className="flex space-x-4">
-                {[
-                  { icon: Facebook, color: "hover:text-blue-400" },
-                  { icon: Instagram, color: "hover:text-pink-400" },
-                  { icon: Twitter, color: "hover:text-blue-300" },
-                  { icon: Youtube, color: "hover:text-red-400" }
-                ].map((social, index) => (
-                  <a
-                    key={index}
-                    href="#"
-                    className={`w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 ${social.color} transition-all duration-300 transform hover:scale-110 hover:bg-gray-700`}
-                  >
-                    <social.icon className="h-5 w-5" />
-                  </a>
-                ))}
-              </div>
-            </div>
-            
-            {/* Products */}
-            <div>
-              <h3 className="text-lg font-bold mb-6 text-white">Sản phẩm</h3>
-              <ul className="space-y-3">
-                {[
-                  "Gậy Pool chuyên nghiệp",
-                  "Gậy Carom cao cấp", 
-                  "Gậy Snooker premium",
-                  "Gậy Break & Jump",
-                  "Phụ kiện bi-a",
-                  "Bàn bi-a gia đình"
-                ].map((item, index) => (
-                  <li key={index}>
-                    <a href="#" className="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center group">
-                      <ChevronRight className="h-4 w-4 mr-2 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            {/* Support */}
-            <div>
-              <h3 className="text-lg font-bold mb-6 text-white">Hỗ trợ khách hàng</h3>
-              <ul className="space-y-3">
-                {[
-                  "Hướng dẫn mua hàng",
-                  "Chính sách đổi trả",
-                  "Chính sách bảo hành",
-                  "Phương thức thanh toán",
-                  "Vận chuyển & giao hàng",
-                  "Câu hỏi thường gặp"
-                ].map((item, index) => (
-                  <li key={index}>
-                    <a href="#" className="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center group">
-                      <ChevronRight className="h-4 w-4 mr-2 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            {/* Contact */}
-            <div>
-              <h3 className="text-lg font-bold mb-6 text-white">Liên hệ</h3>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <MapPin className="h-5 w-5 text-indigo-400 mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="text-white font-medium">Địa chỉ</p>
-                    <p className="text-gray-400">123 Nguyễn Huệ, Quận 1, TP.HCM</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <Phone className="h-5 w-5 text-green-400 mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="text-white font-medium">Hotline</p>
-                    <p className="text-gray-400">1900-1234 (24/7)</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <Mail className="h-5 w-5 text-blue-400 mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="text-white font-medium">Email</p>
-                    <p className="text-gray-400">info@billiardcue.vn</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Newsletter */}
-              <div className="mt-8">
-                <h4 className="text-white font-medium mb-3">Nhận tin khuyến mãi</h4>
-                <div className="flex">
-                  <input
-                    type="email"
-                    placeholder="Email của bạn"
-                    className="flex-1 px-4 py-2 bg-gray-800 border border-gray-600 rounded-l-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
-                  />
-                  <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-r-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300">
-                    <Mail className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Bottom bar */}
-          <div className="border-t border-gray-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 text-center md:text-left">
-                &copy; 2024 BilliardCue Store. All rights reserved.
-              </p>
-              <div className="flex space-x-6 mt-4 md:mt-0">
-                {[
-                  "Điều khoản sử dụng",
-                  "Chính sách bảo mật", 
-                  "Sitemap"
-                ].map((item, index) => (
-                  <a key={index} href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
-                    {item}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 };
