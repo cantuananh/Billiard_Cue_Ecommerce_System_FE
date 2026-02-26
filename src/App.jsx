@@ -24,11 +24,16 @@ const ProtectedRoute = ({ children }) => {
 // Admin Route Component
 const AdminRoute = ({ children }) => {
   const token = localStorage.getItem('accessToken');
-  
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
-  
+
+  if (user.role !== 'ADMIN') {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 };
 
@@ -36,11 +41,13 @@ const AdminRoute = ({ children }) => {
 const PublicRoute = ({ children }) => {
   const token = localStorage.getItem('accessToken');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  
-  if (token) {
-    return <Navigate to="/admin" replace />;
+
+  // Chỉ redirect ADMIN sang admin dashboard
+  // CUSTOMER vẫn được phép vào trang login/register
+  if (token && user.role === 'ADMIN') {
+    return <Navigate to="/admin/dashboard" replace />;
   }
-  
+
   return children;
 };
 
@@ -81,6 +88,7 @@ function App() {
           
           {/* Legacy dashboard redirect */}
           <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="/login/admin" element={<Navigate to="/login" replace />} />
           
           {/* Admin Routes */}
           <Route 
@@ -91,6 +99,7 @@ function App() {
               </AdminRoute>
             }
           >
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="products" element={<ProductManagement />} />

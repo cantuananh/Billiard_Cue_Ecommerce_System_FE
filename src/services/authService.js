@@ -40,6 +40,12 @@ export const authService = {
     return response.data;
   },
 
+  // Login with Google
+  loginWithGoogle: async (credential) => {
+    const response = await api.post('/auth/google-login', { credential });
+    return response.data;
+  },
+
   // Logout (client-side)
   logout: () => {
     localStorage.removeItem('accessToken');

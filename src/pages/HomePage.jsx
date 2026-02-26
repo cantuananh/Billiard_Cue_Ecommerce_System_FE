@@ -16,6 +16,16 @@ import toast from 'react-hot-toast';
 const HomePage = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+  const isLoggedIn = !!localStorage.getItem('accessToken');
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    navigate('/');
+    window.location.reload();
+  };
   const [isScrolled, setIsScrolled] = useState(false);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -178,20 +188,37 @@ const HomePage = () => {
             {/* Auth Buttons & Mobile Menu */}
             <div className="flex items-center space-x-4">
               <div className="hidden sm:flex items-center space-x-3">
-                <Link
-                  to="/login"
-                  className="flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-all duration-300 group"
-                >
-                  <LogIn className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-                  Đăng nhập
-                </Link>
-                <Link
-                  to="/register"
-                  className="flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-                >
-                  <UserPlus className="h-4 w-4 mr-1" />
-                  Đăng ký
-                </Link>
+                {isLoggedIn ? (
+                  <>
+                    <span className="text-gray-600 font-medium text-sm">
+                      Xin chào, {currentUser?.fullName || 'Khách hàng'}
+                    </span>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center text-gray-600 hover:text-red-600 font-medium transition-all duration-300 group"
+                    >
+                      <LogIn className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform rotate-180" />
+                      Đăng xuất
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-all duration-300 group"
+                    >
+                      <LogIn className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+                      Đăng nhập
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                    >
+                      <UserPlus className="h-4 w-4 mr-1" />
+                      Đăng ký
+                    </Link>
+                  </>
+                )}
               </div>
               
               {/* Mobile menu button */}
