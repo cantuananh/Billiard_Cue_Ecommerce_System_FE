@@ -112,8 +112,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
       newErrors.price = 'Giá sản phẩm phải lớn hơn 0';
     }
 
-    if (formData.originalPrice && parseFloat(formData.originalPrice) < parseFloat(formData.price)) {
-      newErrors.originalPrice = 'Giá gốc phải lớn hơn hoặc bằng giá bán';
+    if (formData.originalPrice && parseFloat(formData.price) < parseFloat(formData.originalPrice)) {
+      newErrors.price = 'Giá bán phải lớn hơn hoặc bằng giá gốc';
     }
 
     if (!formData.stockQuantity || parseInt(formData.stockQuantity) < 0) {
