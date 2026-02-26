@@ -18,6 +18,10 @@ api.interceptors.request.use(
     if (token && token !== 'null' && token !== 'undefined') {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // If data is FormData, remove Content-Type so axios/browser sets multipart with boundary automatically
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     return config;
   },
   (error) => {
@@ -72,11 +76,22 @@ api.interceptors.response.use(
     // Skip toast for disabled account on login — Login.jsx will redirect to dedicated page
     const isDisabledError = error.response?.data?.message?.toLowerCase().includes('disabled');
     const isLoginRequest = error.config?.url?.includes('/auth/login');
+    
+    // Don't show duplicate toasts - check if one is already showing
     if (!(isDisabledError && isLoginRequest)) {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('Đã xảy ra lỗi, vui lòng thử lại!');
+      // Only show toast if it's not already showing (avoid spam)
+      const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại!';
+      
+      // Use a flag to prevent duplicate toasts
+      if (!error.config._toastShown) {
+        error.config._toastShown = true;
+        setTimeout(() => {
+          if (error.config) error.config._toastShown = false;
+        }, 1000);
+        
+        toast.error(errorMessage, {
+          id: error.config?.url // Use URL as unique ID to prevent duplicates
+        });
       }
     }
 

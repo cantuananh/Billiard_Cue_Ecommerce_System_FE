@@ -49,7 +49,12 @@ const ImageUploadManager = ({ images, onChange }) => {
 
         // Upload to server
         const response = await adminProductService.uploadProductImage(file);
-        const serverUrl = `http://localhost:8080${response.imageUrl}`;
+        
+        // response is already the data (not wrapped in .data)
+        const imageUrl = response.imageUrl || response;
+        const serverUrl = imageUrl.startsWith('http') 
+          ? imageUrl 
+          : `http://localhost:8080${imageUrl}`;
 
         // Update with server URL
         onChange(prev => prev.map(img => 
@@ -61,8 +66,12 @@ const ImageUploadManager = ({ images, onChange }) => {
           } : img
         ));
 
+        toast.success(`Tải lên ${file.name} thành công!`);
+
       } catch (error) {
-        toast.error(`Lỗi khi tải lên ${file.name}`);
+        console.error('Upload error:', error);
+        const errorMsg = error.response?.data?.message || error.message || 'Lỗi không xác định';
+        toast.error(`Lỗi khi tải lên ${file.name}: ${errorMsg}`);
         // Remove failed upload
         onChange(prev => prev.filter(img => img.file !== file));
       }
