@@ -19,6 +19,7 @@ import UserManagement from './pages/admin/UserManagement';
 import ProductManagement from './pages/admin/ProductManagement';
 import CategoryManagement from './pages/admin/CategoryManagement';
 import OrderManagement from './pages/admin/OrderManagement';
+import AdminSettings from './pages/admin/AdminSettings';
 import CartDrawer from './components/CartDrawer';
 import { CartProvider, useCartContext } from './context/CartContext';
 import './App.css';
@@ -138,8 +139,7 @@ function App() {
             <Route path="products" element={<ProductManagement />} />
             <Route path="categories" element={<CategoryManagement />} />
             <Route path="orders" element={<OrderManagement />} />
-            <Route path="analytics" element={<div className="p-6">Thống kê - Coming soon</div>} />
-            <Route path="settings" element={<div className="p-6">Cài đặt - Coming soon</div>} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
           
           {/* Fallback Route */}

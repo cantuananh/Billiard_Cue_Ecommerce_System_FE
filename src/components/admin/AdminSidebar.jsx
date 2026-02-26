@@ -6,7 +6,6 @@ import {
   Users, 
   Package, 
   ShoppingCart, 
-  BarChart3, 
   Settings,
   LogOut,
   ChevronRight,
@@ -23,7 +22,6 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     { name: 'Quản lý Sản phẩm', href: '/admin/products', icon: Package, current: location.pathname === '/admin/products' },
     { name: 'Quản lý Danh mục', href: '/admin/categories', icon: Tags, current: location.pathname === '/admin/categories' },
     { name: 'Quản lý Đơn hàng', href: '/admin/orders', icon: ShoppingCart, current: location.pathname === '/admin/orders' },
-    { name: 'Thống kê', href: '/admin/analytics', icon: BarChart3, current: location.pathname === '/admin/analytics' },
     { name: 'Cài đặt', href: '/admin/settings', icon: Settings, current: location.pathname === '/admin/settings' },
   ];
 
