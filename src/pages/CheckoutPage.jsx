@@ -178,7 +178,7 @@ const CheckoutPage = () => {
                           name="shippingName"
                           value={form.shippingName}
                           onChange={handleChange}
-                          placeholder="Nguyễn Văn A"
+                          placeholder="Nhập họ và tên người nhận hàng (VD: Nguyễn Văn A)"
                           className={`w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                             errors.shippingName ? 'border-red-400 bg-red-50' : 'border-gray-300'
                           }`}
@@ -203,7 +203,7 @@ const CheckoutPage = () => {
                           name="shippingPhone"
                           value={form.shippingPhone}
                           onChange={handleChange}
-                          placeholder="0901234567"
+                          placeholder="Nhập số điện thoại để shipper liên hệ khi giao hàng (VD: 0901234567)"
                           className={`w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                             errors.shippingPhone ? 'border-red-400 bg-red-50' : 'border-gray-300'
                           }`}
@@ -226,7 +226,7 @@ const CheckoutPage = () => {
                         name="shippingAddress"
                         value={form.shippingAddress}
                         onChange={handleChange}
-                        placeholder="123 Đường Nguyễn Huệ"
+                        placeholder="Nhập số nhà, tên đường (VD: 123 Đường Nguyễn Huệ)"
                         className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                           errors.shippingAddress ? 'border-red-400 bg-red-50' : 'border-gray-300'
                         }`}
@@ -246,7 +246,7 @@ const CheckoutPage = () => {
                         name="shippingWard"
                         value={form.shippingWard}
                         onChange={handleChange}
-                        placeholder="Phường Bến Nghé"
+                        placeholder="Nhập phường/xã/thị trấn (VD: Phường Bến Nghé)"
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                       />
                     </div>
@@ -261,7 +261,7 @@ const CheckoutPage = () => {
                         name="shippingDistrict"
                         value={form.shippingDistrict}
                         onChange={handleChange}
-                        placeholder="Quận 1"
+                        placeholder="Nhập quận/huyện (VD: Quận 1, Huyện Bình Chánh)"
                         className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                           errors.shippingDistrict ? 'border-red-400 bg-red-50' : 'border-gray-300'
                         }`}
@@ -283,7 +283,7 @@ const CheckoutPage = () => {
                         name="shippingProvince"
                         value={form.shippingProvince}
                         onChange={handleChange}
-                        placeholder="TP. Hồ Chí Minh"
+                        placeholder="Nhập tỉnh/thành phố (VD: TP. Hồ Chí Minh, Hà Nội, Đà Nẵng)"
                         className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                           errors.shippingProvince ? 'border-red-400 bg-red-50' : 'border-gray-300'
                         }`}
@@ -373,7 +373,7 @@ const CheckoutPage = () => {
                     value={form.customerNotes}
                     onChange={handleChange}
                     rows={3}
-                    placeholder="Ghi chú thêm cho shop (tùy chọn): ví dụ giao giờ hành chính, gọi trước khi giao..."
+                    placeholder="VD: Giao hàng giờ hành chính (8h–17h), gọi điện trước 30 phút, để hàng tại bảo vệ nếu vắng nhà..."
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors resize-none"
                   />
                 </div>

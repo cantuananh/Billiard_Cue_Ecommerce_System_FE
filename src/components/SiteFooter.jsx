@@ -95,7 +95,7 @@ const SiteFooter = () => {
                 <MapPin className="h-5 w-5 text-indigo-400 mr-3 mt-1 flex-shrink-0" />
                 <div>
                   <p className="text-white font-medium">Địa chỉ</p>
-                  <p className="text-gray-400">123 Nguyễn Huệ, Quận 1, TP.HCM</p>
+                  <p className="text-gray-400">Trường Đại học Thành Đô</p>
                 </div>
               </div>
               <div className="flex items-start">

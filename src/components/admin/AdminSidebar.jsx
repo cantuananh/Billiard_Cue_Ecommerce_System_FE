@@ -18,7 +18,7 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard, current: location.pathname === '/admin/dashboard' },
-    { name: 'Quản lý User', href: '/admin/users', icon: Users, current: location.pathname === '/admin/users' },
+    { name: 'Quản lý người dùng', href: '/admin/users', icon: Users, current: location.pathname === '/admin/users' },
     { name: 'Quản lý Sản phẩm', href: '/admin/products', icon: Package, current: location.pathname === '/admin/products' },
     { name: 'Quản lý Danh mục', href: '/admin/categories', icon: Tags, current: location.pathname === '/admin/categories' },
     { name: 'Quản lý Đơn hàng', href: '/admin/orders', icon: ShoppingCart, current: location.pathname === '/admin/orders' },
