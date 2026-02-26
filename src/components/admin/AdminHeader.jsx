@@ -60,7 +60,7 @@ const AdminHeader = ({ setSidebarOpen }) => {
   const searchSuggestions = [
     { id: 1, name: 'Quản lý sản phẩm', type: 'page', icon: Package, path: '/admin/products' },
     { id: 2, name: 'Quản lý đơn hàng', type: 'page', icon: ShoppingCart, path: '/admin/orders' },
-    { id: 3, name: 'Quản lý user', type: 'page', icon: User, path: '/admin/users' },
+    { id: 3, name: 'Quản lý người dùng', type: 'page', icon: User, path: '/admin/users' },
     { id: 4, name: 'Danh mục', type: 'page', icon: Tag, path: '/admin/categories' },
   ];
 

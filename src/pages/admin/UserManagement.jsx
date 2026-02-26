@@ -190,7 +190,6 @@ const UserManagement = () => {
   const getRoleDisplayName = (role) => {
     switch (role) {
       case 'ADMIN': return 'Quản trị viên';
-      case 'STAFF': return 'Nhân viên';
       case 'CUSTOMER': return 'Khách hàng';
       default: return role;
     }
@@ -276,7 +275,6 @@ const UserManagement = () => {
               >
                 <option value="all">Tất cả vai trò</option>
                 <option value="ADMIN">Quản trị viên</option>
-                <option value="STAFF">Nhân viên</option>
                 <option value="CUSTOMER">Khách hàng</option>
               </select>
             </div>
@@ -393,8 +391,6 @@ const UserManagement = () => {
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       user.role === 'ADMIN' 
                         ? 'bg-purple-100 text-purple-800' 
-                        : user.role === 'STAFF'
-                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-green-100 text-green-800'
                     }`}>
                       {getRoleDisplayName(user.role)}
