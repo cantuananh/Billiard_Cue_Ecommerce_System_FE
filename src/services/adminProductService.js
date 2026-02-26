@@ -55,16 +55,10 @@ export const adminProductService = {
     const formData = new FormData();
     formData.append('file', file);
     
-    const response = await fetch('http://localhost:8080/api/admin/products/upload-image', {
-      method: 'POST',
-      body: formData,
-    });
+    // Content-Type will be auto-set to multipart/form-data by the axios interceptor
+    const response = await api.post('/admin/products/upload-image', formData);
     
-    if (!response.ok) {
-      throw new Error('Failed to upload image');
-    }
-    
-    return response.json();
+    return response.data;
   },
 
   // Get product categories

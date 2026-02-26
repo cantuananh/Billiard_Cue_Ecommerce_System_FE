@@ -128,6 +128,16 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
     return Object.keys(newErrors).length === 0;
   };
 
+  const generateSku = () => {
+    const prefix = formData.name
+      ? formData.name.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 3)
+      : 'SP';
+    const random = Math.floor(1000 + Math.random() * 9000);
+    const sku = `${prefix}-${random}`;
+    setFormData(prev => ({ ...prev, sku }));
+    if (errors.sku) setErrors(prev => ({ ...prev, sku: '' }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -157,7 +167,14 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
       await onSubmit(submitData);
     } catch (error) {
       console.error('Error submitting product:', error);
-      toast.error('Có lỗi xảy ra khi lưu sản phẩm');
+      // Handle specific backend errors
+      const message = error?.response?.data?.message || error?.response?.data || '';
+      if (typeof message === 'string' && message.toLowerCase().includes('sku')) {
+        setErrors(prev => ({ ...prev, sku: 'Mã SKU này đã tồn tại, vui lòng dùng mã khác' }));
+        toast.error('Mã SKU đã tồn tại!');
+      } else {
+        toast.error(typeof message === 'string' && message ? message : 'Có lỗi xảy ra khi lưu sản phẩm');
+      }
     }
   };
 
@@ -200,17 +217,29 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading, categories 
 
             {/* SKU */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Mã sản phẩm (SKU)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-700">
+                  Mã sản phẩm (SKU)
+                </label>
+                <button
+                  type="button"
+                  onClick={generateSku}
+                  className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                >
+                  ↺ Tạo tự động
+                </button>
+              </div>
               <input
                 type="text"
                 name="sku"
                 value={formData.sku}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="CB-001"
+                className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                  errors.sku ? 'border-red-300' : ''
+                }`}
+                placeholder="CB-001 hoặc nhấn Tạo tự động"
               />
+              {errors.sku && <p className="mt-1 text-sm text-red-600">{errors.sku}</p>}
             </div>
 
             {/* Category */}
